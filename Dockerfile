@@ -21,22 +21,23 @@ WORKDIR /var/www/html
 # Copiar archivos del proyecto
 COPY . .
 
-# Instalar dependencias de Laravel (sin interacción)
+# Instalar dependencias de Laravel
 RUN composer install --no-interaction --optimize-autoloader
 
 # Asignar permisos
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Habilitar mod_rewrite
+# Habilitar mod_rewrite para Laravel
 RUN a2enmod rewrite
 
-# Variable de entorno para Render
-ENV PORT=8080
+# Configurar Apache para que sirva desde /public
+RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
 
-# Configurar Apache para escuchar el puerto que Render asigne
+# Configurar Apache para escuchar el puerto Render
+ENV PORT=8080
 RUN sed -i "s/80/${PORT}/g" /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf
 
-# Exponer el puerto dinámico
+# Exponer el puerto
 EXPOSE 8080
 
 # Comando de inicio
