@@ -13,7 +13,7 @@
                         <img src="{{ asset('img/galletasyvelas.jpeg') }}" class="absolute inset-0 z-0 w-full h-full object-cover object-center" alt="...">
                         <div class="absolute inset-0 z-10 bg-gray-900/30 flex items-center justify-center">
                             <div class="max-w-3xl mx-auto w-full text-center px-6">
-                                <h1 class="text-[5px] md:text-[4rem] font-bold text-white">Descubre el cataalogo de nuestras deliciosas galletas</h1>
+                                <h1 class="text-[5px] md:text-[4rem] font-bold text-white">Descubre el catálogo de nuestras deliciosas galletas</h1>
                                 <br><br>
                                 <a href="{{ url('productos#galletas') }}" class="inline-block mt-4 md:mt-6 px-5 py-2 md:px-6 md:py-3 bg-pink-600 text-white rounded-lg shadow hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-400">
                                     Ver galletas
