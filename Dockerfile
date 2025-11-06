@@ -24,18 +24,20 @@ COPY . .
 # Instalar dependencias de Laravel (sin interacción)
 RUN composer install --no-interaction --optimize-autoloader
 
-# Asignar permisos a las carpetas necesarias
+# Asignar permisos
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Habilitar mod_rewrite (necesario para Laravel o rutas limpias)
+# Habilitar mod_rewrite
 RUN a2enmod rewrite
 
-# Configurar Apache para usar el puerto asignado por Render
-ENV PORT=10000
-EXPOSE 10000
+# Variable de entorno para Render
+ENV PORT=8080
 
-# Actualizar configuración de Apache para escuchar ese puerto
-RUN sed -i "s/80/\${PORT}/g" /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf
+# Configurar Apache para escuchar el puerto que Render asigne
+RUN sed -i "s/80/${PORT}/g" /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf
 
-# Iniciar Apache en primer plano
+# Exponer el puerto dinámico
+EXPOSE 8080
+
+# Comando de inicio
 CMD ["apache2-foreground"]
