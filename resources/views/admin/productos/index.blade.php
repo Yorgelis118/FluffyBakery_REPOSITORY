@@ -7,11 +7,18 @@
 <div class="bg-white rounded-lg shadow overflow-hidden">
   <div class="p-4 border-b flex justify-between items-center">
     <h2 class="text-lg font-semibold text-gray-800">Productos</h2>
-    <a href="{{ route('productos.create') }}" 
-       class="px-4 py-2 rounded-lg flex items-center bg-pink-400 text-white hover:bg-pink-500 cursor-pointer">
-      <i class="fas fa-plus mr-2"></i>
-      Nuevo Producto
-    </a>
+    <div class="flex gap-2">
+      <button onclick="openCategoryModal()" 
+         class="px-4 py-2 rounded-lg flex items-center bg-pink-400 text-white hover:bg-pink-500 cursor-pointer">
+        <i class="fas fa-tags mr-2"></i>
+        Nueva Categoría
+      </button>
+      <a href="{{ route('productos.create') }}" 
+         class="px-4 py-2 rounded-lg flex items-center bg-pink-400 text-white hover:bg-pink-500 cursor-pointer">
+        <i class="fas fa-plus mr-2"></i>
+        Nuevo Producto
+      </a>
+    </div>
   </div>
 
   <!-- Categorías -->
@@ -21,30 +28,12 @@
          class="px-4 py-2 rounded-lg flex items-center transition {{ ($activeCategory ?? request('category')) === null ? 'bg-pink-100 text-pink-600 font-semibold shadow-md' : 'text-gray-600 hover:text-pink-500' }}">
         <i class="fas fa-list mr-2"></i>Todos
       </a>
-      <a href="{{ route('productos.index', ['category' => 'pasteles']) }}" 
-         class="px-4 py-2 rounded-lg flex items-center transition {{ ($activeCategory ?? request('category')) === 'pasteles' ? 'bg-pink-100 text-pink-600 font-semibold shadow-md' : 'text-gray-600 hover:text-pink-500' }}">
-        <i class="fas fa-birthday-cake mr-2"></i>Pasteles
-      </a>
-      <a href="{{ route('productos.index', ['category' => 'cupcakes']) }}" 
-         class="px-4 py-2 rounded-lg flex items-center transition {{ ($activeCategory ?? request('category')) === 'cupcakes' ? 'bg-pink-100 text-pink-600 font-semibold shadow-md' : 'text-gray-600 hover:text-pink-500' }}">
-        <i class="fas fa-ice-cream mr-2"></i>Cupcakes
-      </a>
-      <a href="{{ route('productos.index', ['category' => 'galletas']) }}" 
-         class="px-4 py-2 rounded-lg flex items-center transition {{ ($activeCategory ?? request('category')) === 'galletas' ? 'bg-pink-100 text-pink-600 font-semibold shadow-md' : 'text-gray-600 hover:text-pink-500' }}">
-        <i class="fas fa-cookie-bite mr-2"></i>Galletas
-      </a>
-      <a href="{{ route('productos.index', ['category' => 'rellenos']) }}" 
-         class="px-4 py-2 rounded-lg flex items-center transition {{ ($activeCategory ?? request('category')) === 'rellenos' ? 'bg-pink-100 text-pink-600 font-semibold shadow-md' : 'text-gray-600 hover:text-pink-500' }}">
-        <i class="fas fa-cheese mr-2"></i>Rellenos
-      </a>
-      <a href="{{ route('productos.index', ['category' => 'brownies']) }}" 
-         class="px-4 py-2 rounded-lg flex items-center transition {{ ($activeCategory ?? request('category')) === 'brownies' ? 'bg-pink-100 text-pink-600 font-semibold shadow-md' : 'text-gray-600 hover:text-pink-500' }}">
-        <i class="fas fa-square mr-2"></i>Brownies
-      </a>
-      <a href="{{ route('productos.index', ['category' => 'alfajores']) }}" 
-         class="px-4 py-2 rounded-lg flex items-center transition {{ ($activeCategory ?? request('category')) === 'alfajores' ? 'bg-pink-100 text-pink-600 font-semibold shadow-md' : 'text-gray-600 hover:text-pink-500' }}">
-        <i class="fas fa-cookie mr-2"></i>Alfajores
-      </a>
+      @foreach($categorias as $categoria)
+        <a href="{{ route('productos.index', ['category' => $categoria->slug]) }}" 
+           class="px-4 py-2 rounded-lg flex items-center transition {{ ($activeCategory ?? request('category')) === $categoria->slug ? 'bg-pink-100 text-pink-600 font-semibold shadow-md' : 'text-gray-600 hover:text-pink-500' }}">
+          <i class="fas {{ $categoria->icon }} mr-2"></i>{{ $categoria->name }}
+        </a>
+      @endforeach
     </div>
   </div>
 
@@ -108,4 +97,94 @@
     </table>
   </div>
 </div>
+
+<!-- Modal para crear categoría -->
+<div id="categoryModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+  <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-gray-800">Nueva Categoría</h3>
+        <button onclick="closeCategoryModal()" class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      
+      @if($errors->any())
+        <div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          <ul class="list-disc list-inside">
+            @foreach($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+      @endif
+
+      @if(session('success'))
+        <div class="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+          {{ session('success') }}
+        </div>
+      @endif
+
+      <form action="{{ route('categorias.store') }}" method="POST">
+        @csrf
+        <div class="mb-4">
+          <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+            Nombre de la Categoría
+          </label>
+          <input type="text" 
+                 id="name" 
+                 name="name" 
+                 value="{{ old('name') }}"
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-transparent"
+                 placeholder="Ej: Pasteles, Cupcakes, etc."
+                 required>
+        </div>
+        
+        <div class="flex justify-end gap-2">
+          <button type="button" 
+                  onclick="closeCategoryModal()"
+                  class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">
+            Cancelar
+          </button>
+          <button type="submit" 
+                  class="px-4 py-2 bg-pink-400 text-white rounded-lg hover:bg-pink-500">
+            <i class="fas fa-save mr-2"></i>
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openCategoryModal() {
+    document.getElementById('categoryModal').classList.remove('hidden');
+  }
+
+  function closeCategoryModal() {
+    document.getElementById('categoryModal').classList.add('hidden');
+  }
+
+  // Cerrar modal al hacer clic fuera de él
+  document.getElementById('categoryModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeCategoryModal();
+    }
+  });
+
+  // Cerrar modal con la tecla ESC
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeCategoryModal();
+    }
+  });
+
+  // Abrir modal automáticamente si hay errores de validación
+  @if($errors->has('name'))
+    document.addEventListener('DOMContentLoaded', function() {
+      openCategoryModal();
+    });
+  @endif
+</script>
 @endsection

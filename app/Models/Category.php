@@ -21,4 +21,29 @@ class Category extends Model
     {
         return $this->hasMany(Producto::class, 'id_category', 'id_category');
     }
+
+    /**
+     * Obtener el icono de Font Awesome según el nombre de la categoría
+     */
+    public function getIconAttribute()
+    {
+        $iconMap = [
+            'Pasteles' => 'fa-birthday-cake',
+            'Cupcakes' => 'fa-ice-cream',
+            'Galletas' => 'fa-cookie-bite',
+            'Rellenos' => 'fa-cheese',
+            'Brownies' => 'fa-square',
+            'Alfajores' => 'fa-cookie',
+        ];
+
+        return $iconMap[$this->name] ?? 'fa-tag'; // Icono por defecto si no hay coincidencia
+    }
+
+    /**
+     * Obtener el slug de la categoría (nombre en minúsculas)
+     */
+    public function getSlugAttribute()
+    {
+        return strtolower($this->name);
+    }
 }

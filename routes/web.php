@@ -4,6 +4,7 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\CarritoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -83,6 +84,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // CRUD de productos dentro del área admin
     Route::resource('admin/productos', ProductoController::class)->names('productos');
+    
+    // Ruta para crear categorías
+    Route::post('/admin/categorias', [CategoryController::class, 'store'])->name('categorias.store');
 });
 
 

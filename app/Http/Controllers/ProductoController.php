@@ -19,8 +19,10 @@ class ProductoController extends Controller
         $query = Producto::with('category');
 
         if ($category && $category !== 'todos') {
-            $query->whereHas('category', function ($q) use ($category) {
-                $q->where('name', $category);
+            // Convertir el slug a formato de nombre (primera letra mayúscula)
+            $categoryName = ucfirst($category);
+            $query->whereHas('category', function ($q) use ($categoryName) {
+                $q->where('name', $categoryName);
             });
         }
 
@@ -33,8 +35,11 @@ class ProductoController extends Controller
         }
 
         $productos = $query->orderBy('display_order')->orderBy('product_name')->get();
+        
+        // Obtener todas las categorías de la base de datos
+        $categorias = Category::orderBy('name')->get();
 
-        return view('admin.productos.index', compact('productos', 'category', 'searchQuery'));
+        return view('admin.productos.index', compact('productos', 'category', 'searchQuery', 'categorias'));
     }
 
     /**
